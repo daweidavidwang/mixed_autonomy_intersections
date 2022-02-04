@@ -176,7 +176,11 @@ class Dist:
 class CatDist(Dist):
     def __init__(self, inputs):
         super().__init__(inputs)
-        self.dist = torch.distributions.categorical.Categorical(logits=inputs)
+        try:
+            self.dist = torch.distributions.categorical.Categorical(logits=inputs)
+        except:
+            import logging
+            logging.info(str(inputs))
 
     def argmax(self):
         return self.dist.probs.argmax(dim=-1)

@@ -1,6 +1,6 @@
 from u import *
 from ut import *
-
+import ray
 class Main(Config):
     code_root = Path(__file__)._up._real
 
@@ -108,9 +108,9 @@ class Main(Config):
         if c.e is False:
             if c.tb:
                 for k, v in stats.items():
-                    c._writer.add_scalar(k, v, global_step=c._i, walltime=total_time)
-            if c.wb:
-                c._writer.log(stats, step=c._i)
+                    c._writer.add_scalar(k, v, global_step=c._i)
+            # if c.wb:
+            #     c._writer.log(stats, step=c._i)
 
     def get_log_ii(c, ii, n_ii, print_time=False):
         return lambda **kwargs: c.log_stats(kwargs, ii, n_ii, print_time=print_time)
@@ -170,7 +170,6 @@ class Main(Config):
     def rollouts(c):
         """ Collect a list of rollouts for the training step """
         if c.use_ray:
-            import ray
             weights_id = ray.put({k: v.cpu() for k, v in c._model.state_dict().items()})
             [w.set_weights.remote(weights_id) for w in c._rollout_workers]
             rollout_stats = flatten(ray.get([w.rollouts_single_process.remote() for w in c._rollout_workers]))
