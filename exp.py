@@ -209,7 +209,12 @@ class Main(Config):
         a_space = c.action_space
         step = 0
         while step < c.horizon + c.skip_stat_steps and not done:
-            pred = from_torch(c._model(to_torch(rollout.obs[-1]), value=False, policy=True, argmax=False))
+            try:
+                pred = from_torch(c._model(to_torch(rollout.obs[-1]), value=False, policy=True, argmax=False))
+            except:
+                print("fatal error!!!!!!!!!!!!!!!!!!")
+                print(str(rollout.obs))
+                continue
             if c.get('aclip', True) and isinstance(a_space, Box):
                 pred.action = np.clip(pred.action, a_space.low, a_space.high)
             rollout.append(**pred)
@@ -285,6 +290,7 @@ class Main(Config):
     def train(c):
         c.on_train_start()
         while c._i < c.n_steps:
+            print(str(c._i))
             c.on_step_start()
             with torch.no_grad():
                 rollouts = c.rollouts()
@@ -295,6 +301,8 @@ class Main(Config):
                 gd_stats.update(gd_time=time() - t_start)
             c.on_step_end(gd_stats)
             c._i += 1
+            del rollouts
+            
         c.on_step_start() # last step
         with torch.no_grad():
             rollouts = c.rollouts()

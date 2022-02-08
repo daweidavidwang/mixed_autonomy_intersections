@@ -280,7 +280,7 @@ if __name__ == '__main__':
         render=False,
 
         warmup_steps=100,
-        horizon=2000,
+        horizon=600,
         directions=['up', 'right'],
         av_frac=0.15,
         flow_rate=700,

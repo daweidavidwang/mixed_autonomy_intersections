@@ -1,6 +1,6 @@
 gym
 lxml
-ray
+ray==1.8.0
 traci
 pyyaml
 numpy
