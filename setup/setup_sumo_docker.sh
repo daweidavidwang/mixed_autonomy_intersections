@@ -1,17 +1,19 @@
 #!/bin/bash
+#!/bin/bash
 apt-get update
 echo "Installing system dependencies"
-apt-get install -y cmake libgtest-dev
-apt-get install -y autoconf libtool pkg-config libgdal-dev libxerces-c-dev
-apt-get install -y libproj-dev libfox-1.6-dev libxml2-dev libxslt1-dev
-apt-get install -y build-essential curl unzip flex bison
+apt-get install -y cmake libopenmpi-dev zlib1g-dev
+apt-get install -y autoconf build-essential libtool
+apt-get install -y libxerces-c3.1 libxerces-c3-dev libproj-dev
+apt-get install -y proj-bin proj-data libgdal1-dev
+apt-get install -y libfox-1.6-0 libfox-1.6-dev
 
 echo "Installing sumo binaries"
 mkdir -p $HOME/sumo_binaries/bin
 pushd $HOME/sumo_binaries/bin
-wget https://akreidieh.s3.amazonaws.com/sumo/flow-0.4.0/binaries-ubuntu1804.tar.xz
-tar -xf binaries-ubuntu1804.tar.xz
-rm binaries-ubuntu1804.tar.xz
+wget https://akreidieh.s3.amazonaws.com/sumo/flow-0.4.0/binaries-ubuntu1404.tar.xz
+tar -xf binaries-ubuntu1404.tar.xz
+rm binaries-ubuntu1404.tar.xz
 chmod +x *
 popd
 echo 'export PATH="$HOME/sumo_binaries/bin:$PATH"' >> ~/.bashrc
