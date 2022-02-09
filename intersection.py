@@ -282,7 +282,7 @@ if __name__ == '__main__':
         warmup_steps=100,
         horizon=600,
         directions=['up', 'right'],
-        av_frac=0.15,
+        av_frac=0,
         flow_rate=700,
         length=100,
         n_rows=2,

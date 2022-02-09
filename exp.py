@@ -211,23 +211,31 @@ class Main(Config):
         while step < c.horizon + c.skip_stat_steps and not done:
             try:
                 pred = from_torch(c._model(to_torch(rollout.obs[-1]), value=False, policy=True, argmax=False))
+                if c.get('aclip', True) and isinstance(a_space, Box):
+                    pred.action = np.clip(pred.action, a_space.low, a_space.high)
+                rollout.append(**pred)
+
+                ret = c._env.step(rollout.action[-1])
+                if isinstance(ret, tuple):
+                    obs, reward, done, info = ret
+                    ret = dict(obs=obs, reward=reward, done=done, info=info)
+                done = ret.setdefault('done', False)
+                if done:
+                    ret = {k: v for k, v in ret.items() if k not in ['obs', 'id']}
+                rollout.append(**ret)
+                step += 1
             except:
                 print("fatal error!!!!!!!!!!!!!!!!!!")
                 print(str(rollout.obs))
-                continue
-            if c.get('aclip', True) and isinstance(a_space, Box):
-                pred.action = np.clip(pred.action, a_space.low, a_space.high)
-            rollout.append(**pred)
+                ret = c._env.step([])
+                if isinstance(ret, tuple):
+                    obs, reward, done, info = ret
+                    ret = dict(obs=obs, reward=reward, done=done, info=info)
+                done = ret.setdefault('done', False)
+                if done:
+                    ret = {k: v for k, v in ret.items() if k not in ['obs', 'id']}
+                rollout.append(**ret)
 
-            ret = c._env.step(rollout.action[-1])
-            if isinstance(ret, tuple):
-                obs, reward, done, info = ret
-                ret = dict(obs=obs, reward=reward, done=done, info=info)
-            done = ret.setdefault('done', False)
-            if done:
-                ret = {k: v for k, v in ret.items() if k not in ['obs', 'id']}
-            rollout.append(**ret)
-            step += 1
         stats = dict(rollout_time=time() - t_start, **c.get_env_stats())
         return rollout, stats
 
